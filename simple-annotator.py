@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import os
 import sys
-import pygtk
-pygtk.require('2.0')
-import gtk
+import gi
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk as gtk
 
 class SimpleAnnotator:
     # list of files in the given directory
@@ -22,14 +22,14 @@ class SimpleAnnotator:
         # save ground truth to text file
         with open(os.path.splitext(self.imageFile)[0] + ".gt.txt", 'w') as f:
             f.write(entry.get_text())
-        print self.imageFile + ": " + entry.get_text()
+        print(self.imageFile + ": " + entry.get_text())
         
         # load the next image, if one without annotation exists
         entry.set_text("")
         entry.grab_focus()
         self.imageFile = self.get_next_file()        
         if self.imageFile == None:
-            print "All images have been annotated."
+            print("All images have been annotated.")
             gtk.main_quit()
         image.set_from_file(self.imageFile)
     
@@ -56,7 +56,7 @@ class SimpleAnnotator:
             sys.exit("No png files without annotation found!")
         
         # create the main window, and attach delete_event signal for terminating
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        window = gtk.Window(gtk.WindowType.TOPLEVEL)
         window.connect("delete_event", self.close_application)
         window.set_border_width(10)
         window.show()
@@ -71,19 +71,19 @@ class SimpleAnnotator:
         image = gtk.Image()
         image.set_from_file(self.imageFile)
         image.show()
-        vbox.pack_start(image)
+        vbox.pack_start(image, True, False, 0)
         
         # text field
-        entry = gtk.Entry(max=0)
+        entry = gtk.Entry()
         entry.show()
-        vbox.pack_start(entry,expand=False)
+        vbox.pack_start(entry,expand=False, fill=False, padding=0)
         entry.grab_focus()
         entry.set_activates_default(True)
         
         # button
         button = gtk.Button("Submit")
         button.show()
-        vbox.pack_start(button, expand=False)
+        vbox.pack_start(button, expand=False, fill=False, padding=0)
         button.set_can_default(True)
         button.grab_default()
         button.connect("clicked", self.button_clicked, image, entry)
